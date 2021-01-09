@@ -1,0 +1,26 @@
+- name: Configuring Vlans
+  hosts: gns3-ios
+  gather_facts: no
+  connection: local
+  
+  vars:
+    cli:
+      username: redo
+      password: cisco
+      
+  tasks:
+  - name: Reading vlan information
+    read_csv:
+      path: vlans.csv
+    register: vlans
+  - name: Sending a vlanID
+    ios_config:
+      provider: "{{ cli }}"
+      authorize: yes
+      parents: "vlan {{vlan.vlanID}}"
+      lines :
+        - "name {{vlan.vlanDesc}}"
+      
+    loop: "{{ vlans.list }}"
+    loop_control:
+      loop_var: vlan 
